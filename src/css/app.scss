@@ -1,1 +1,25 @@
-// app global css in SCSS form
+* {
+  transition: all 0.2s ease;
+}
+
+// Card hover effects
+.q-card {
+  &:hover {
+    .absolute-bottom-right {
+      opacity: 1;
+    }
+  }
+
+  .absolute-bottom-right {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+}
+
+// Ellipsis helper
+.ellipsis-2-lines {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
