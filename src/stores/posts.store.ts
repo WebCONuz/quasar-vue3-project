@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/axios';
-import { Notify } from 'quasar';
 import type { CreatePost, Post } from '../static/types';
 
 interface PostsState {
@@ -39,11 +38,6 @@ export const usePostsStore = defineStore('posts', {
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: 'Postlarni yuklashda xatolik',
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -61,11 +55,6 @@ export const usePostsStore = defineStore('posts', {
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: 'Postni yuklashda xatolik',
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -80,21 +69,10 @@ export const usePostsStore = defineStore('posts', {
         const response = await api.post('/posts', postData);
         this.posts.push(response.data);
 
-        Notify.create({
-          type: 'positive',
-          message: "Post muvaffaqiyatli qo'shildi",
-          position: 'top',
-        });
-
         return response.data;
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: "Postni qo'shishda xatolik",
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -107,27 +85,15 @@ export const usePostsStore = defineStore('posts', {
 
       try {
         const response = await api.put(`/posts/${id}`, postData);
-
         const index = this.posts.findIndex((p) => p.id === id);
         if (index !== -1) {
           this.posts[index] = response.data;
         }
 
-        Notify.create({
-          type: 'positive',
-          message: 'Post muvaffaqiyatli yangilandi',
-          position: 'top',
-        });
-
         return response.data;
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: 'Postni yangilashda xatolik',
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -141,20 +107,9 @@ export const usePostsStore = defineStore('posts', {
       try {
         await api.delete(`/posts/${id}`);
         this.posts = this.posts.filter((p) => p.id !== id);
-
-        Notify.create({
-          type: 'positive',
-          message: "Post muvaffaqiyatli o'chirildi",
-          position: 'top',
-        });
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: "Postni o'chirishda xatolik",
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;

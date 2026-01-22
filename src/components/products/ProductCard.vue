@@ -34,11 +34,21 @@ const handleDelete = (product: Product) => {
     void (async () => {
       try {
         await productsStore.deleteProduct(product.id);
+        $q.notify({
+          type: 'positive',
+          message: "Mahsulot muvaffaqiyatli o'chirildi",
+          position: 'top',
+        });
         emit('delete', product.id);
       } catch (error) {
+        $q.notify({
+          type: 'negative',
+          message: "O'chirishda xatolik",
+          position: 'top',
+        });
         console.error('Delete error:', error);
       }
-    });
+    })();
   });
 };
 
@@ -95,7 +105,7 @@ const handleEdit = (product: Product) => {
   </q-card>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .title {
   height: 32px;
   width: 100%;

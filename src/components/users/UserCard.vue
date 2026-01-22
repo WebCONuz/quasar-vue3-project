@@ -26,7 +26,7 @@ const { user } = defineProps<PropsType>();
   </q-card>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .title {
   height: 32px;
   width: 100%;

@@ -8,6 +8,12 @@ interface ProductsState {
   loading: boolean;
   error: string | null;
   categories: string[];
+  pagination: {
+    total: number;
+    limit: number;
+    skip: number;
+    currentPage: number;
+  };
 }
 
 export const useProductsStore = defineStore('products', {
@@ -17,6 +23,12 @@ export const useProductsStore = defineStore('products', {
     loading: false,
     error: null,
     categories: [],
+    pagination: {
+      total: 0,
+      limit: 12,
+      skip: 0,
+      currentPage: 1,
+    },
   }),
 
   getters: {
@@ -50,24 +62,35 @@ export const useProductsStore = defineStore('products', {
     productsSortedByPriceDesc: (state) => {
       return [...state.products].sort((a, b) => b.price - a.price);
     },
+
+    // Pagination getters
+    totalPages: (state) => Math.ceil(state.pagination.total / state.pagination.limit),
   },
 
   actions: {
     // Barcha mahsulotlarni olish (READ ALL)
-    async fetchProducts() {
+    async fetchProducts(page: number = 1) {
       this.loading = true;
       this.error = null;
+      const skip = (page - 1) * this.pagination.limit;
 
       try {
-        const response = await api.get('/products');
+        const response = await api.get('/products', {
+          params: {
+            limit: this.pagination.limit,
+            skip: skip,
+          },
+        });
+
         this.products = response.data.products;
+        this.pagination.total = response.data.total;
+        this.pagination.skip = skip;
+        this.pagination.currentPage = page;
 
         return response.data.products;
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        console.log('Mahsulotlarni yuklashda xatolik');
-
         throw error;
       } finally {
         this.loading = false;
@@ -87,7 +110,6 @@ export const useProductsStore = defineStore('products', {
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        console.log('Mahsulotlarni yuklashda xatolik');
         throw error;
       } finally {
         this.loading = false;
@@ -103,13 +125,10 @@ export const useProductsStore = defineStore('products', {
         const response = await api.post('/products/add', productData);
         this.products.push(response.data);
 
-        console.log('Mahsulotlarni yuklashda xatolik');
-
         return response.data;
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        console.log('Mahsulotlarni yuklashda xatolik');
         throw error;
       } finally {
         this.loading = false;
@@ -129,12 +148,10 @@ export const useProductsStore = defineStore('products', {
         if (index !== -1) {
           this.products[index] = response.data;
         }
-        console.log('Mahsulot muvaffaqiyatli yangilandi');
         return response.data;
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        console.log('Mahsulotlarni yuklashda xatolik');
         throw error;
       } finally {
         this.loading = false;
@@ -150,25 +167,33 @@ export const useProductsStore = defineStore('products', {
         await api.delete(`/products/${id}`);
         // State'dan o'chirish
         this.products = this.products.filter((p) => p.id !== id);
-        console.log("Mahsulot muvaffaqiyatli o'chirildi");
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        console.log('Mahsulotlarni yuklashda xatolik');
         throw error;
       } finally {
         this.loading = false;
       }
     },
 
-    // Qo'shimcha: Qidirish
-    async searchProducts(query: string) {
+    // Qo'shimcha: Qidirish (Search)
+    async searchProducts(query: string, page: number = 1) {
       this.loading = true;
       this.error = null;
+      const skip = (page - 1) * this.pagination.limit;
 
       try {
-        const response = await api.get(`/products/search?q=${query}`);
+        const response = await api.get(`/products/search`, {
+          params: {
+            q: query,
+            limit: this.pagination.limit,
+            skip: skip,
+          },
+        });
         this.products = response.data.products;
+        this.pagination.total = response.data.total;
+        this.pagination.skip = skip;
+        this.pagination.currentPage = page;
 
         return response.data.products;
       } catch (error: unknown) {
@@ -200,7 +225,6 @@ export const useProductsStore = defineStore('products', {
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        console.log('Kategoriyalarni yuklashda xatolik');
         throw error;
       } finally {
         this.loading = false;

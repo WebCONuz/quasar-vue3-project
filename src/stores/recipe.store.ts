@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/axios';
-import { Notify } from 'quasar';
 import type { CreateRecipe, Recipe } from '../static/types';
 
 interface RecipesState {
@@ -49,11 +48,6 @@ export const useRecipesStore = defineStore('recipes', {
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: 'Retseptlarni yuklashda xatolik',
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -71,11 +65,6 @@ export const useRecipesStore = defineStore('recipes', {
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: 'Retseptni yuklashda xatolik',
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -90,21 +79,10 @@ export const useRecipesStore = defineStore('recipes', {
         const response = await api.post('/recipes', recipeData);
         this.recipes.push(response.data);
 
-        Notify.create({
-          type: 'positive',
-          message: "Retsept muvaffaqiyatli qo'shildi",
-          position: 'top',
-        });
-
         return response.data;
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: "Retseptni qo'shishda xatolik",
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -123,21 +101,10 @@ export const useRecipesStore = defineStore('recipes', {
           this.recipes[index] = response.data;
         }
 
-        Notify.create({
-          type: 'positive',
-          message: 'Retsept muvaffaqiyatli yangilandi',
-          position: 'top',
-        });
-
         return response.data;
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: 'Retseptni yangilashda xatolik',
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -151,20 +118,9 @@ export const useRecipesStore = defineStore('recipes', {
       try {
         await api.delete(`/recipes/${id}`);
         this.recipes = this.recipes.filter((r) => r.id !== id);
-
-        Notify.create({
-          type: 'positive',
-          message: "Retsept muvaffaqiyatli o'chirildi",
-          position: 'top',
-        });
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: "Retseptni o'chirishda xatolik",
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;

@@ -3,6 +3,7 @@ import { ref, watch, computed } from 'vue';
 import type { Product, CreateProduct } from '../../static/types';
 import { useProductsStore } from '../../stores/products.store';
 import { storeToRefs } from 'pinia';
+import { useQuasar } from 'quasar';
 
 // Props
 const props = defineProps<{
@@ -17,6 +18,7 @@ const emit = defineEmits<{
 }>();
 
 // Store
+const $q = useQuasar();
 const productsStore = useProductsStore();
 const { loading, categories } = storeToRefs(productsStore);
 
@@ -36,6 +38,16 @@ const modalTitle = computed(() => (isEditMode.value ? 'Mahsulotni tahrirlash' : 
 const titleRules = [(val: string) => (val && val.length > 0) || 'Sarlavha majburiy'];
 const priceRules = [(val: number) => val > 0 || "Narx musbat son bo'lishi kerak"];
 
+// Reset form
+const resetForm = () => {
+  form.value = {
+    title: '',
+    description: '',
+    category: '',
+    price: 0,
+  };
+};
+
 // Watch props.product - edit mode uchun
 watch(
   () => props.product,
@@ -47,20 +59,12 @@ watch(
         category: newProduct.category,
         price: newProduct.price,
       };
+    } else {
+      resetForm();
     }
   },
   { immediate: true },
 );
-
-// Reset form
-const resetForm = () => {
-  form.value = {
-    title: '',
-    description: '',
-    category: '',
-    price: 0,
-  };
-};
 
 // Close modal
 const closeModal = () => {
@@ -76,15 +80,30 @@ const onSubmit = async () => {
     if (isEditMode.value && props.product) {
       // UPDATE
       await productsStore.updateProduct(props.product.id, form.value);
+      $q.notify({
+        type: 'positive',
+        message: 'Mahsulot muvaffaqiyatli yangilandi',
+        position: 'top',
+      });
     } else {
       // CREATE
       await productsStore.createProduct(form.value);
+      $q.notify({
+        type: 'positive',
+        message: "Mahsulot muvaffaqiyatli qo'shildi",
+        position: 'top',
+      });
     }
 
     emit('success');
     closeModal();
     resetForm();
   } catch (error) {
+    $q.notify({
+      type: 'negative',
+      message: isEditMode.value ? 'Yangilashda xatolik' : "Qo'shishda xatolik",
+      position: 'top',
+    });
     console.error('Submit error:', error);
   }
 };

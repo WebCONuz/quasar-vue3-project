@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { api } from 'boot/axios';
-import { Notify } from 'quasar';
 import type { CreateUser, User } from '../static/types';
 
 interface UsersState {
@@ -39,11 +38,6 @@ export const useUsersStore = defineStore('users', {
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: 'Foydalanuvchilarni yuklashda xatolik',
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -61,11 +55,6 @@ export const useUsersStore = defineStore('users', {
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: 'Foydalanuvchini yuklashda xatolik',
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -80,21 +69,10 @@ export const useUsersStore = defineStore('users', {
         const response = await api.post('/users', userData);
         this.users.push(response.data);
 
-        Notify.create({
-          type: 'positive',
-          message: "Foydalanuvchi muvaffaqiyatli qo'shildi",
-          position: 'top',
-        });
-
         return response.data;
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: "Foydalanuvchini qo'shishda xatolik",
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -107,27 +85,15 @@ export const useUsersStore = defineStore('users', {
 
       try {
         const response = await api.put(`/users/${id}`, userData);
-
         const index = this.users.findIndex((u) => u.id === id);
         if (index !== -1) {
           this.users[index] = response.data;
         }
 
-        Notify.create({
-          type: 'positive',
-          message: 'Foydalanuvchi muvaffaqiyatli yangilandi',
-          position: 'top',
-        });
-
         return response.data;
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: 'Foydalanuvchini yangilashda xatolik',
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
@@ -141,20 +107,9 @@ export const useUsersStore = defineStore('users', {
       try {
         await api.delete(`/users/${id}`);
         this.users = this.users.filter((u) => u.id !== id);
-
-        Notify.create({
-          type: 'positive',
-          message: "Foydalanuvchi muvaffaqiyatli o'chirildi",
-          position: 'top',
-        });
       } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Noma'lum xatolik";
         this.error = errorMessage;
-        Notify.create({
-          type: 'negative',
-          message: "Foydalanuvchini o'chirishda xatolik",
-          position: 'top',
-        });
         throw error;
       } finally {
         this.loading = false;
